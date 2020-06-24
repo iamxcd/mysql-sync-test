@@ -1,0 +1,27 @@
+version: "3"
+services:
+  master:
+    image: "mysql:5.5"
+    restart: always
+    privileged: true
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - "$PWD/database/master:/var/lib/mysql"
+    ports:
+      - 9106:3306
+  slave:
+    image: "mysql:5.5"
+    restart: always
+    privileged: true
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - "$PWD/database/slave:/var/lib/mysql"
+    ports:
+      - 9107:3306
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 9108:8080
