@@ -6,14 +6,11 @@
 
 ## 导入mysql配置文件
 ```
-// 最开始是想将config/db 下面的配置分别映射到容器内,但是权限不对,mysql启动时配置被忽略.chmod也修改不到
+之前权限无法修改原因是:我在虚拟机下的linux 共享目录到win10,整个项目 直接在linux中操作,就没问题.
 
-docker cp config/db/master/conf.d/mysqld.cnf mysqltest_master_1:/etc/mysql/conf.d/mysqld.cnf
-docker cp config/db/slave/conf.d/mysqld.cnf mysqltest_slave_1:/etc/mysql/conf.d/mysqld.cnf
-
-docker-compose exec master bash
-然后进容器 chmod 644 mysqld.cnf 这种方式就能改了.
-
+// 设置下权限
+chmod 644 $PWD/config/db/master/conf.d/mysqld.cnf
+chmod 644 $PWD/config/db/slave/conf.d/mysqld.cnf
 ```
 
 ![运行情况](./imgs/微信截图_20200624152317.png)
@@ -28,11 +25,13 @@ show master status
 
 ## 在从数据操作
 ```
-change master to master_host='172.20.0.4', master_user='root', master_password='root', master_port=3306, master_log_file='mysql-bin.000004', master_log_pos= 747, master_connect_retry=30;
+// master_log_file master_log_pos 主库 show master status 中的两个字段
+// host 可以直接用容器名
+change master to master_host='master', master_user='root', master_password='root', master_port=3306, master_log_file='mysql-bin.000004', master_log_pos= 747, master_connect_retry=30;
 
 start slave //开启主从同步
 show slave status // 查看主从同步状态
 ```
 
 ## 最后测试
-主库创建张表,插入数据 从库也有相应数据
+测试结果和预料的一样.
